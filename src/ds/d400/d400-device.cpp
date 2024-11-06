@@ -479,7 +479,14 @@ namespace librealsense
 
         std::vector<std::shared_ptr<platform::uvc_device>> depth_devices;
         for (auto&& info : filter_by_mi(all_device_infos, 0)) // Filter just mi=0, DEPTH
-            depth_devices.push_back( get_backend()->create_uvc_device( info ) );
+        {
+            auto uvc_device = get_backend()->create_uvc_device(info);
+            if (uvc_device)
+                depth_devices.push_back(uvc_device);
+        }
+
+	    if (depth_devices.empty())
+            throw std::runtime_error("No create_uvc_devices");        
 
         std::unique_ptr< frame_timestamp_reader > timestamp_reader_backup( new ds_timestamp_reader() );
         frame_timestamp_reader* timestamp_reader_from_metadata;
